@@ -6,11 +6,6 @@ from selfdrive.car import STD_CARGO_KG, scale_rot_inertia, scale_tire_stiffness,
 from selfdrive.car.interfaces import CarInterfaceBase
 
 class CarInterface(CarInterfaceBase):
-
-  @staticmethod
-  def compute_gb(accel, speed):
-    return float(accel) / 3.0
-
   @staticmethod
   def get_params(candidate, fingerprint=gen_empty_fingerprint(), car_fw=[]):  # pylint: disable=dangerous-default-value
     ret = CarInterfaceBase.get_std_params(candidate, fingerprint)
@@ -223,7 +218,7 @@ class CarInterface(CarInterfaceBase):
 
     # these cars require a special panda safety mode due to missing counters and checksums in the messages
     if candidate in [CAR.HYUNDAI_GENESIS, CAR.IONIQ_EV_2020, CAR.IONIQ_EV_LTD, CAR.IONIQ_PHEV, CAR.IONIQ, CAR.KONA_EV, CAR.KIA_SORENTO,
-                     CAR.SONATA_LF, CAR.KIA_NIRO_EV, CAR.KIA_OPTIMA, CAR.VELOSTER, CAR.KIA_STINGER, CAR.KIA_SELTOS,
+                     CAR.SONATA_LF, CAR.KIA_NIRO_EV, CAR.KIA_OPTIMA, CAR.VELOSTER, CAR.KIA_STINGER,
                      CAR.GENESIS_G70, CAR.GENESIS_G80, CAR.KIA_CEED, CAR.ELANTRA]:
       ret.safetyModel = car.CarParams.SafetyModel.hyundaiLegacy
 
