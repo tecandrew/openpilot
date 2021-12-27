@@ -1,6 +1,7 @@
 #!/bin/bash -e
 
 OP_ROOT=$(git rev-parse --show-toplevel)
+ARCH=$(uname -m)
 
 # Install brew if required
 if [[ $(command -v brew) == "" ]]; then
@@ -27,6 +28,8 @@ brew "openssl"
 brew "pyenv"
 brew "qt@5"
 brew "zeromq"
+brew "swig"
+brew "protobuf"
 cask "gcc-arm-embedded"
 EOS
 
@@ -41,33 +44,49 @@ fi
 # https://github.com/pyca/cryptography/blob/main/docs/installation.rst
 rustup-init -y
 
-export LDFLAGS="$LDFLAGS -L/usr/local/opt/zlib/lib"
-export LDFLAGS="$LDFLAGS -L/usr/local/opt/bzip2/lib"
-export LDFLAGS="$LDFLAGS -L/usr/local/opt/openssl@1.1/lib"
-export CPPFLAGS="$CPPFLAGS -I/usr/local/opt/zlib/include"
-export CPPFLAGS="$CPPFLAGS -I/usr/local/opt/bzip2/include"
-export CPPFLAGS="$CPPFLAGS -I/usr/local/opt/openssl@1.1/include"
+# linker
+export LDFLAGS="$LDFLAGS -L/usr/local/opt/zlib/lib -L/opt/homebrew/opt/zlib/lib"
+export LDFLAGS="$LDFLAGS -L/usr/local/opt/bzip2/lib -L/opt/homebrew/opt/bzip2/lib"
+export LDFLAGS="$LDFLAGS -L/usr/local/opt/openssl@1.1/lib -L/opt/homebrew/opt/openssl@1.1/lib"
+export LDFLAGS="$LDFLAGS -L/opt/homebrew/opt/qt@5/lib"
+
+# defs
+export CPPFLAGS="$CPPFLAGS -I/usr/local/opt/zlib/include -I/opt/homebrew/opt/zlib/include"
+export CPPFLAGS="$CPPFLAGS -I/usr/local/opt/bzip2/include -I/opt/homebrew/opt/bzip2/include"
+export CPPFLAGS="$CPPFLAGS -I/usr/local/opt/openssl@1.1/include -I/opt/homebvrew/opt/openssl@1.1/include"
+export CPPFLAGS="$CPPFLAGS -I/opt/homebrew/opt/qt@5/include"
+
+# execs
 export PATH="$PATH:/usr/local/opt/openssl@1.1/bin"
+export PATH="$PATH:/opt/homebrew/opt/qt@5/bin"
 export PATH="$PATH:/usr/local/bin"
 
-# OpenPilot environment variables
+# OpenPilot environment build variables
 if [ -z "$OPENPILOT_ENV" ] && [ -n "$RC_FILE" ] && [ -z "$CI" ]; then
   echo "export PATH=\"\$PATH:$HOME/.cargo/bin\"" >> $RC_FILE
   echo "source $OP_ROOT/tools/openpilot_env.sh" >> $RC_FILE
-  export PATH="$PATH:\"\$HOME/.cargo/bin\""
+  export PATH="$PATH:\"\$HOME/.cargo/bin\":\"/opt/homebrew/opt/qt@5/bin:$PATH\""
   source "$OP_ROOT/tools/openpilot_env.sh"
   echo "Added openpilot_env to RC file: $RC_FILE"
 fi
 
-# install python
+# TODO build and install casadi
+# install python and depends
 PYENV_PYTHON_VERSION=$(cat $OP_ROOT/.python-version)
+if [[ $ARCH == "arm64" ]]; then
+  PYENV_PYTHON_VERSION=3.9.9
+fi
 PATH=$HOME/.pyenv/bin:$HOME/.pyenv/shims:$PATH
 pyenv install -s ${PYENV_PYTHON_VERSION}
 pyenv rehash
 eval "$(pyenv init -)"
 
 pip install pipenv==2020.8.13
-pipenv install --dev --deploy
+if [[ $ARCH != "arm64" ]] ; then
+  pipenv install --dev --deploy install
+else
+  pipenv install --dev --deploy --skip-lock
+fi
 
 echo
 echo "----   FINISH OPENPILOT SETUP   ----"

@@ -19,6 +19,9 @@ selfdrive/ui/replay/replay <route-name>
 # watch the replay with the normal openpilot UI
 cd selfdrive/ui && ./ui
 
+# if ui is too large, scale down the replay using `SCALE`
+SCALE=0.5 ./ui
+
 # or try out a debug visualizer:
 python replay/ui.py
 ```
