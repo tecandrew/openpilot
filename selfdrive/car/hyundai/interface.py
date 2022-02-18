@@ -106,6 +106,8 @@ class CarInterface(CarInterfaceBase):
       tire_stiffness_factor = 0.65
       ret.lateralTuning.pid.kiBP, ret.lateralTuning.pid.kpBP = [[0.], [0.]]
       ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[0.25], [0.05]]
+      ret.longitudinalTuning.kpV = [0.1]
+      ret.longitudinalTuning.kiV = [0.0]
     elif candidate == CAR.HYUNDAI_GENESIS:
       ret.lateralTuning.pid.kf = 0.00005
       ret.mass = 2060. + STD_CARGO_KG
