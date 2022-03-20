@@ -46,6 +46,7 @@ class CarController:
     self.steer_rate_limited = False
     self.last_resume_frame = 0
     self.accel = 0
+    self.engage_delay = 0
 
   def update(self, CC, CS):
     actuators = CC.actuators
@@ -99,8 +100,7 @@ class CarController:
       # accel = clip(accel, CarControllerParams.ACCEL_MIN, CarControllerParams.ACCEL_MAX)
       # gregh test https://discordapp.com/channels/469524606043160576/524611978208215070/954923040972603452
       accel = -3.5 if CC.enabled and CS.out.vEgoRaw > 0.02 else 0
-      stopping = 0
-      self.engage_delay = 0
+      stopping = CS.out.vEgoRaw < 0.2
       if CC.enabled:
           if self.engage_delay >= 200:
             accel = 2.0
