@@ -92,8 +92,8 @@ class CarController:
       lead_visible = False
       accel = actuators.accel if CC.longActive else 0
 
-      # jerk = clip(2.0 * (accel - CS.out.aEgo), -12.7, 12.7)
-      jerk = clip(2.0 * (accel - CS.out.aEgo), 12.7, 0)
+      jerk = clip(2.0 * (accel - CS.out.aEgo), -12.7, 12.7)
+      # jerk = clip(2.0 * (accel - CS.out.aEgo), 12.7, 0)
 
       if accel < 0:
         accel = interp(accel - CS.out.aEgo, [-1.0, -0.5], [2 * accel, accel])
